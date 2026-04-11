@@ -18,6 +18,7 @@ class HTMLNode:
             output += f" {prop}={self.props[prop]}"
         
         return output
+    
 
     def __repr__(self):
-        return f"<{self.tag or "no tag"}{self.props_to_html()}>{self.value or "no value"}</{self.tag or "no tag"}>\nChildren: {self.children or "no children"}"
+        return f"<{self.tag or "no tag"}{self.props_to_html()}>{self.value or "no value"}</{self.tag or "no tag"}> Children: {self.children or "no children"}"
