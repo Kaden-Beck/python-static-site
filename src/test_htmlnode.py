@@ -1,6 +1,6 @@
 import unittest
 
-from htmlnode import HTMLNode
+from html_node import HTMLNode
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -10,7 +10,7 @@ class TestHTMLNode(unittest.TestCase):
 
         self.assertEqual(
             repr(node),
-            f"<p style=italic>This is a paragraph</p> Children: no children",
+            f'<p style="italic">This is a paragraph</p> Children: no children',
         )
 
     ## Test no args passed
