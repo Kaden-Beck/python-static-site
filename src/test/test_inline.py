@@ -1,5 +1,5 @@
 import unittest
-from src.util import split_nodes_delimiter, split_nodes_image, split_nodes_link, extract_markdown_images, extract_markdown_links, text_to_textnodes
+from src.inline import *
 from src.textnode import TextNode, TextType
 
 
@@ -79,10 +79,13 @@ class TestImageParser(unittest.TestCase):
         result = extract_markdown_images(
             "![first](https://example.com/1.png) and ![second](https://example.com/2.png)"
         )
-        self.assertEqual(result, [
-            ("first", "https://example.com/1.png"),
-            ("second", "https://example.com/2.png"),
-        ])
+        self.assertEqual(
+            result,
+            [
+                ("first", "https://example.com/1.png"),
+                ("second", "https://example.com/2.png"),
+            ],
+        )
 
     def test_no_images(self):
         result = extract_markdown_images("just plain text with no images")
@@ -102,10 +105,13 @@ class TestLinkParser(unittest.TestCase):
         result = extract_markdown_links(
             "[first](https://example.com/1) and [second](https://example.com/2)"
         )
-        self.assertEqual(result, [
-            ("first", "https://example.com/1"),
-            ("second", "https://example.com/2"),
-        ])
+        self.assertEqual(
+            result,
+            [
+                ("first", "https://example.com/1"),
+                ("second", "https://example.com/2"),
+            ],
+        )
 
     def test_no_links(self):
         result = extract_markdown_links("just plain text with no links")
@@ -119,23 +125,38 @@ class TestLinkParser(unittest.TestCase):
 class TestSplitNodesImage(unittest.TestCase):
     def test_single_image(self):
         nodes = split_nodes_image(
-            [TextNode("before ![alt](https://example.com/img.png) after", TextType.TEXT)]
+            [
+                TextNode(
+                    "before ![alt](https://example.com/img.png) after", TextType.TEXT
+                )
+            ]
         )
-        self.assertEqual(nodes, [
-            TextNode("before ", TextType.TEXT),
-            TextNode("alt", TextType.IMAGE, "https://example.com/img.png"),
-            TextNode(" after", TextType.TEXT),
-        ])
+        self.assertEqual(
+            nodes,
+            [
+                TextNode("before ", TextType.TEXT),
+                TextNode("alt", TextType.IMAGE, "https://example.com/img.png"),
+                TextNode(" after", TextType.TEXT),
+            ],
+        )
 
     def test_multiple_images(self):
         nodes = split_nodes_image(
-            [TextNode("![one](https://example.com/1.png) and ![two](https://example.com/2.png)", TextType.TEXT)]
+            [
+                TextNode(
+                    "![one](https://example.com/1.png) and ![two](https://example.com/2.png)",
+                    TextType.TEXT,
+                )
+            ]
         )
-        self.assertEqual(nodes, [
-            TextNode("one", TextType.IMAGE, "https://example.com/1.png"),
-            TextNode(" and ", TextType.TEXT),
-            TextNode("two", TextType.IMAGE, "https://example.com/2.png"),
-        ])
+        self.assertEqual(
+            nodes,
+            [
+                TextNode("one", TextType.IMAGE, "https://example.com/1.png"),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("two", TextType.IMAGE, "https://example.com/2.png"),
+            ],
+        )
 
     def test_no_images_passthrough(self):
         node = TextNode("just plain text", TextType.TEXT)
@@ -153,21 +174,32 @@ class TestSplitNodesLink(unittest.TestCase):
         nodes = split_nodes_link(
             [TextNode("before [click](https://example.com) after", TextType.TEXT)]
         )
-        self.assertEqual(nodes, [
-            TextNode("before ", TextType.TEXT),
-            TextNode("click", TextType.LINK, "https://example.com"),
-            TextNode(" after", TextType.TEXT),
-        ])
+        self.assertEqual(
+            nodes,
+            [
+                TextNode("before ", TextType.TEXT),
+                TextNode("click", TextType.LINK, "https://example.com"),
+                TextNode(" after", TextType.TEXT),
+            ],
+        )
 
     def test_multiple_links(self):
         nodes = split_nodes_link(
-            [TextNode("[first](https://example.com/1) and [second](https://example.com/2)", TextType.TEXT)]
+            [
+                TextNode(
+                    "[first](https://example.com/1) and [second](https://example.com/2)",
+                    TextType.TEXT,
+                )
+            ]
         )
-        self.assertEqual(nodes, [
-            TextNode("first", TextType.LINK, "https://example.com/1"),
-            TextNode(" and ", TextType.TEXT),
-            TextNode("second", TextType.LINK, "https://example.com/2"),
-        ])
+        self.assertEqual(
+            nodes,
+            [
+                TextNode("first", TextType.LINK, "https://example.com/1"),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("second", TextType.LINK, "https://example.com/2"),
+            ],
+        )
 
     def test_no_links_passthrough(self):
         node = TextNode("just plain text", TextType.TEXT)
@@ -184,18 +216,23 @@ class TestTextToTextNodes(unittest.TestCase):
     def test_full_example(self):
         text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
         nodes = text_to_textnodes(text)
-        self.assertEqual(nodes, [
-            TextNode("This is ", TextType.TEXT),
-            TextNode("text", TextType.BOLD),
-            TextNode(" with an ", TextType.TEXT),
-            TextNode("italic", TextType.ITALIC),
-            TextNode(" word and a ", TextType.TEXT),
-            TextNode("code block", TextType.CODE),
-            TextNode(" and an ", TextType.TEXT),
-            TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
-            TextNode(" and a ", TextType.TEXT),
-            TextNode("link", TextType.LINK, "https://boot.dev"),
-        ])
+        self.assertEqual(
+            nodes,
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("text", TextType.BOLD),
+                TextNode(" with an ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" word and a ", TextType.TEXT),
+                TextNode("code block", TextType.CODE),
+                TextNode(" and an ", TextType.TEXT),
+                TextNode(
+                    "obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"
+                ),
+                TextNode(" and a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+            ],
+        )
 
     def test_plain_text(self):
         nodes = text_to_textnodes("just plain text")
