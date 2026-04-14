@@ -1,6 +1,6 @@
 import unittest
 
-from src.block import markdown_to_blocks
+from src.block import markdown_to_blocks, block_to_block_type, BlockType
 
 
 class TestMarkdownToBlocks(unittest.TestCase):
@@ -42,6 +42,47 @@ This is the same paragraph on a new line
     def test_empty_string(self):
         blocks = markdown_to_blocks("")
         self.assertEqual(blocks, [])
+
+
+class TestBlockToBlockType(unittest.TestCase):
+    def test_heading_h1(self):
+        self.assertEqual(block_to_block_type("# Heading"), BlockType.HEADING)
+
+    def test_heading_h3(self):
+        self.assertEqual(block_to_block_type("### Heading"), BlockType.HEADING)
+
+    def test_heading_h6(self):
+        self.assertEqual(block_to_block_type("###### Heading"), BlockType.HEADING)
+
+    def test_not_heading_missing_space(self):
+        self.assertEqual(block_to_block_type("#Heading"), BlockType.PARAGRAPH)
+
+    def test_code_block(self):
+        self.assertEqual(block_to_block_type("```\nsome code\n```"), BlockType.CODE)
+
+    def test_not_code_missing_newline(self):
+        self.assertEqual(block_to_block_type("```no newline```"), BlockType.PARAGRAPH)
+
+    def test_quote(self):
+        self.assertEqual(block_to_block_type("> line one\n> line two"), BlockType.QUOTE)
+
+    def test_not_quote_mixed(self):
+        self.assertEqual(block_to_block_type("> line one\nline two"), BlockType.PARAGRAPH)
+
+    def test_unordered_list(self):
+        self.assertEqual(block_to_block_type("- item one\n- item two"), BlockType.UNORDERED_LIST)
+
+    def test_not_unordered_list_mixed(self):
+        self.assertEqual(block_to_block_type("- item one\nitem two"), BlockType.PARAGRAPH)
+
+    def test_ordered_list(self):
+        self.assertEqual(block_to_block_type("1. first\n2. second\n3. third"), BlockType.ORDERED_LIST)
+
+    def test_not_ordered_list_mixed(self):
+        self.assertEqual(block_to_block_type("1. first\nsecond"), BlockType.PARAGRAPH)
+
+    def test_paragraph(self):
+        self.assertEqual(block_to_block_type("just a paragraph"), BlockType.PARAGRAPH)
 
 
 if __name__ == "__main__":
