@@ -8,7 +8,9 @@ class TestParentNode(unittest.TestCase):
     def test_to_html_renders_children(self):
         child = LeafNode("p", "This is a paragraph of text.")
         node = ParentNode("div", [child])
-        self.assertEqual(node.to_html(), "<div><p>This is a paragraph of text.</p></div>")
+        self.assertEqual(
+            node.to_html(), "<div><p>This is a paragraph of text.</p></div>"
+        )
 
     def test_to_html_renders_multiple_children(self):
         child_one = LeafNode("b", "Bold")
