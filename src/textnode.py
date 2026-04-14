@@ -1,9 +1,10 @@
 from enum import Enum
-from leaf_node import LeafNode
+from .leaf_node import LeafNode
 
 
 class TextType(Enum):
-    PLAIN = "plain"
+    PLAIN = "text"
+    TEXT = "text"
     BOLD = "bold"
     ITALIC = "italic"
     CODE = "code"
@@ -36,9 +37,9 @@ def text_note_to_html_node(text_node: TextNode):
         case TextType.BOLD:
             return LeafNode(tag="b", value=text_node.text)
         case TextType.ITALIC:
-            return
-        case TextType.CODE:
             return LeafNode(tag="i", value=text_node.text)
+        case TextType.CODE:
+            return LeafNode(tag="code", value=text_node.text)
         case TextType.LINK:
             return LeafNode(
                 tag="a", value=text_node.text, props={"href": text_node.url}
@@ -48,4 +49,32 @@ def text_note_to_html_node(text_node: TextNode):
                 tag="img", value="", props={"src": text_node.url, "alt": text_node.text}
             )
         case _:
-            raise Exception("Text node is wrong type")
+            raise Exception("Text node is not an existing type")
+
+
+def split_nodes_delimiter(
+    old_nodes: list[TextNode],
+    delimiter: str | None,
+    text_type: TextType = TextType.TEXT,
+) -> list[TextNode]:
+    new_nodes: list[TextNode] = []
+
+    for node in old_nodes:
+        # Node is already not a text node
+        if node.text_type != TextType.TEXT:
+            new_nodes.append(node)
+        else:
+            split_nodes: list[str] = node.text.split(delimiter, 2)
+
+            if len(split_nodes) < 3:
+                raise Exception("Invalid markdown - Closing Delimiter not found")
+
+            my_nodes = [
+                TextNode(split_nodes[0], TextType.TEXT),
+                TextNode(split_nodes[1], text_type),
+                TextNode(split_nodes[2], TextType.TEXT),
+            ]
+
+            new_nodes.extend(my_nodes)
+
+    return new_nodes

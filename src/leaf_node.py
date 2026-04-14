@@ -1,9 +1,9 @@
-from html_node import HTMLNode
+from .html_node import HTMLNode
 
 
 # Leaf nodes cannot have children, value and tag are required, props is optional
 class LeafNode(HTMLNode):
-    def __init__(self, tag, value, props=None):
+    def __init__(self, tag=None, value=None, props=None):
         super().__init__(tag=tag, value=value, children=None, props=props)
 
     def to_html(self):
