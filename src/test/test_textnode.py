@@ -100,7 +100,61 @@ class TestTextNodeParsing(unittest.TestCase):
 
 
 class TestDelimiter(unittest.TestCase):
-    pass
+    # Delimiter issue
+    def test_wrong_delimiter(self):
+        with self.assertRaises(ValueError):
+            split_nodes_delimiter(
+                [TextNode("", TextType.TEXT)],
+                delimiter="-",
+            )
+
+    # Only one delimiter (not closed)
+    def test_missing_delimiter(self):
+        with self.assertRaises(Exception):
+            split_nodes_delimiter(
+                [TextNode("no closing **bold", TextType.TEXT)],
+                delimiter="**",
+                text_type=TextType.BOLD,
+            )
+
+    # Bold
+    def test_bold(self):
+        nodes = split_nodes_delimiter(
+            [TextNode("Hello **world** foo", TextType.TEXT)],
+            delimiter="**",
+            text_type=TextType.BOLD,
+        )
+        self.assertEqual(nodes, [
+            TextNode("Hello ", TextType.TEXT),
+            TextNode("world", TextType.BOLD),
+            TextNode(" foo", TextType.TEXT),
+        ])
+
+    # Italic
+    def test_italic(self):
+        nodes = split_nodes_delimiter(
+            [TextNode("Hello _world_ foo", TextType.TEXT)],
+            delimiter="_",
+            text_type=TextType.ITALIC,
+        )
+        self.assertEqual(nodes, [
+            TextNode("Hello ", TextType.TEXT),
+            TextNode("world", TextType.ITALIC),
+            TextNode(" foo", TextType.TEXT),
+        ])
+
+    # Code
+    def test_code(self):
+        nodes = split_nodes_delimiter(
+            [TextNode("Hello `world` foo", TextType.TEXT)],
+            delimiter="`",
+            text_type=TextType.CODE,
+        )
+        self.assertEqual(nodes, [
+            TextNode("Hello ", TextType.TEXT),
+            TextNode("world", TextType.CODE),
+            TextNode(" foo", TextType.TEXT),
+        ])
 
 
 if __name__ == "__main__":

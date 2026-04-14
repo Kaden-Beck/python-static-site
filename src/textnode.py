@@ -30,7 +30,7 @@ class TextNode:
 
 
 def text_note_to_html_node(text_node: TextNode):
-
+    # create proper node dependent on TextType
     match text_node.text_type:
         case TextType.TEXT:
             return LeafNode(value=text_node.text)
@@ -64,15 +64,25 @@ def split_nodes_delimiter(
         if node.text_type != TextType.TEXT:
             new_nodes.append(node)
         else:
-            split_nodes: list[str] = node.text.split(delimiter, 2)
+            match delimiter:
+                case "**":
+                    type = TextType.BOLD
+                case "_":
+                    type = TextType.ITALIC
+                case "`":
+                    type = TextType.CODE
+                case _:
+                    raise ValueError("Delimiter not in accepted delimiters")
 
-            if len(split_nodes) < 3:
+            split: list[str] = node.text.split(delimiter, 2)
+
+            if len(split) < 3:
                 raise Exception("Invalid markdown - Closing Delimiter not found")
 
             my_nodes = [
-                TextNode(split_nodes[0], TextType.TEXT),
-                TextNode(split_nodes[1], text_type),
-                TextNode(split_nodes[2], TextType.TEXT),
+                TextNode(split[0], TextType.TEXT),
+                TextNode(split[1], type),
+                TextNode(split[2], TextType.TEXT),
             ]
 
             new_nodes.extend(my_nodes)
