@@ -1,9 +1,9 @@
-from src.build import init_directory, generate_page
+from src.build import init_build_directory, generate_pages_recursive
 
 
 def main():
-    init_directory("./static", "./public")
-    generate_page("./content/index.md", "src/template.html", "./public/index.html")
+    init_build_directory("./static", "./public")
+    generate_pages_recursive("./content", "src/template.html", "./public")
 
 
 if __name__ == "__main__":
