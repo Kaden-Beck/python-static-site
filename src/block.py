@@ -16,15 +16,16 @@ class BlockType(Enum):
 
 
 def block_to_block_type(block: str) -> BlockType:
-    # headings
+    # Headings (1-6 '#' followed by a space)
     if re.match(r"^#{1,6} ", block):
         return BlockType.HEADING
-    # Code Block
+    # Code Block (Starts and end with "```" followed by a newline)
     if block[0:4] == "```\n" and block[-3:] == "```":
         return BlockType.CODE
 
+    # If neither of the above, split block into lines
     lines = block.split("\n")
-
+    # Check that each line in the block matches a pattern and use short-circuit to return  proper BlockType
     if all(line.startswith(">") for line in lines):
         return BlockType.QUOTE
     if all(line.startswith("- ") for line in lines):
@@ -32,5 +33,5 @@ def block_to_block_type(block: str) -> BlockType:
     if all(re.match(r"^\d+\. ", line) for line in lines):
         return BlockType.ORDERED_LIST
 
-    # Else its a paragraph
+    # Else its a just paragraph block
     return BlockType.PARAGRAPH
