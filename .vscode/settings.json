@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
         "textnode"
-    ]
+    ],
+    "python.REPL.enableREPLSmartSend": false
 }
