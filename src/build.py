@@ -1,5 +1,6 @@
 import os
 import shutil
+from src.md_parser import markdown_to_html_node, extract_title
 
 
 def init_directory(source, destination):
@@ -45,3 +46,31 @@ def copy_directory(source, destination):
             os.mkdir(dst_path)
             print(f"Copying directory {src_path}")
             copy_directory(src_path, dst_path)
+
+
+def generate_page(from_path: str, template_path: str, dest_path: str):
+    print(
+        f"Generating page from {from_path} to {dest_path} using template at {template_path}"
+    )
+    with open(from_path, "r") as f:
+        md = f.read()
+    with open(template_path, "r") as t:
+        template = t.read()
+
+    title = extract_title(md)
+
+    html = markdown_to_html_node(md).to_html()
+
+    new_page = template.replace("{{ Title }}", title.capitalize()).replace(
+        "{{ Content }}", html
+    )
+
+    os.makedirs(
+        os.path.dirname(
+            dest_path,
+        ),
+        exist_ok=True,
+    )
+
+    with open(dest_path, "w") as d:
+        d.write(new_page)

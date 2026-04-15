@@ -15,10 +15,9 @@ def text_to_children(block: str) -> list[HTMLNode]:
     for text_node in text_to_textnodes(block):
         html_nodes.append(text_node_to_html_node(text_node))
 
-    if len(html_nodes) > 1:
-        return html_nodes
-    else:
+    if len(html_nodes) == 1 and html_nodes[0].tag is None:
         return None
+    return html_nodes
 
 
 def markdown_to_html_node(markdown: str) -> HTMLNode:
@@ -86,9 +85,9 @@ def code_block_to_html(c_block: str) -> LeafNode:
     # Uses a pre tag to enclose the code tag
     return ParentNode(
         tag="pre",
-        children=[LeafNode(
-            tag="code", value="".join(c_block.splitlines(keepends=True)[1:-1])
-        )],
+        children=[
+            LeafNode(tag="code", value="".join(c_block.splitlines(keepends=True)[1:-1]))
+        ],
     )
 
 
@@ -142,3 +141,11 @@ def ordered_block_to_html(o_block: str) -> ParentNode:
             item_nodes.append(LeafNode(tag="li", value=line_item))
 
     return ParentNode(tag="ol", children=item_nodes)
+
+
+def extract_title(markdown: str) -> str:
+    for line in markdown.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("# "):
+            return stripped[2:]
+    raise Exception("No h1 header found")

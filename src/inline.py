@@ -21,8 +21,7 @@ def extract_markdown_links(text: str) -> list[LinkTuple]:
     return re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
 
 
-def split_nodes_delimiter(
-    old_nodes: list[TextNode],
+def split_nodes_delimiter(    old_nodes: list[TextNode],
     delimiter: str | None,
     text_type: TextType = TextType.TEXT,
 ) -> list[TextNode]:
