@@ -1,11 +1,8 @@
-from textnode import TextNode
+from build import init_directory
 
 
 def main():
-    node = TextNode("This is ome anchor text", "link", "https://www.boot.dev")
-
-    print(node)
-    print("")
+    init_directory("./static", "./public")
 
 
 if __name__ == "__main__":
