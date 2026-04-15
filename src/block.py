@@ -1,5 +1,6 @@
 import re
 from enum import Enum
+from html_node import HTMLNode, LeafNode, ParentNode
 
 
 def markdown_to_blocks(markdown: str) -> list[str]:
@@ -35,14 +36,3 @@ def block_to_block_type(block: str) -> BlockType:
 
     # Else its a just paragraph block
     return BlockType.PARAGRAPH
-
-
-def get_heading_level(p_block: str) -> int:
-    level = 0
-    for char in p_block:
-        if char == " ":
-            return level
-        elif char == "#":
-            level += 1
-        else:
-            raise Exception(f"Error parsing heading:\n{p_block}")
