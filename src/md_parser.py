@@ -42,11 +42,9 @@ def markdown_to_html_node(markdown: str) -> HTMLNode:
             case BlockType.QUOTE:
                 block_nodes.append(quote_block_to_html(block))
             case BlockType.UNORDERED_LIST:
-                children = text_to_children(block)
-                pass
+                block_nodes.append(unordered_block_to_html(block))
             case BlockType.ORDERED_LIST:
-                children = text_to_children(block)
-                pass
+                block_nodes.append(ordered_block_to_html(block))
             case _:
                 raise ValueError("Invalid block type was passed")
 
@@ -54,12 +52,13 @@ def markdown_to_html_node(markdown: str) -> HTMLNode:
 
 
 def paragraph_block_to_html(p_block: str) -> HTMLNode:
-    children = text_to_children(p_block)
+    plain = " ".join(p_block.splitlines())
+    children = text_to_children(plain)
 
     if children:
         return ParentNode(tag="p", children=children)
     else:
-        return LeafNode(tag="p", value=p_block)
+        return LeafNode(tag="p", value=plain)
 
 
 def heading_block_to_html(h_block: str) -> HTMLNode:
@@ -73,6 +72,9 @@ def heading_block_to_html(h_block: str) -> HTMLNode:
     content = h_block[level + 1 :]
     children = text_to_children(content)
 
+    # Ensure max heading level is 6 after hashes removed
+    level = 6 if level > 6 else level
+
     if children:
         return ParentNode(tag=f"h{level}", children=children)
     else:
@@ -81,11 +83,19 @@ def heading_block_to_html(h_block: str) -> HTMLNode:
 
 def code_block_to_html(c_block: str) -> LeafNode:
     # Remove the first and last lines, retaining white space characters before appending
-    return LeafNode(tag="code", value="".join(c_block.splitlines(keepends=True)[1:-1]))
+    # Uses a pre tag to enclose the code tag
+    return ParentNode(
+        tag="pre",
+        children=[LeafNode(
+            tag="code", value="".join(c_block.splitlines(keepends=True)[1:-1])
+        )],
+    )
 
 
 def quote_block_to_html(q_block: str) -> HTMLNode:
-
+    # Split lines and remove either ">" or "> "
+    # Join converted lines and check for children
+    # Return HTML node
     new_lines: list[str] = []
     for line in q_block.splitlines():
         new_line = line[2:] if len(line) > 1 and line[1] == " " else line[1:]
@@ -98,3 +108,37 @@ def quote_block_to_html(q_block: str) -> HTMLNode:
         return ParentNode(tag="blockquote", children=children)
     else:
         return LeafNode(tag="blockquote", value=content)
+
+
+def unordered_block_to_html(u_block: str) -> ParentNode:
+    # split lines
+    #   Strip each line of its '-'
+    #   Check if there are children
+    #   Convert to a leaf or parent node with <li>
+    #   Add HTML node to list
+    # Return parent node <ul> with lines as children
+    item_nodes: list[HTMLNode] = []
+    for line in u_block.splitlines():
+        line_item = line[2:]
+        children = text_to_children(line_item)
+
+        if children:
+            item_nodes.append(ParentNode(tag="li", children=children))
+        else:
+            item_nodes.append(LeafNode(tag="li", value=line_item))
+
+    return ParentNode(tag="ul", children=item_nodes)
+
+
+def ordered_block_to_html(o_block: str) -> ParentNode:
+    item_nodes: list[HTMLNode] = []
+    for line in o_block.splitlines():
+        line_item = line.split(". ", 1)[1]
+        children = text_to_children(line_item)
+
+        if children:
+            item_nodes.append(ParentNode(tag="li", children=children))
+        else:
+            item_nodes.append(LeafNode(tag="li", value=line_item))
+
+    return ParentNode(tag="ol", children=item_nodes)
