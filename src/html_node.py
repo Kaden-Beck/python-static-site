@@ -23,15 +23,36 @@ class HTMLNode:
         return f'<{self.tag or "no tag"}{self.props_to_html()}>{self.value or "no value"}</{self.tag or "no tag"}> Children: {self.children or "no children"}'
 
 
-def markdown_to_html_node(markdown: str) -> HTMLNode:
-    # 1) Spilt into blocks
-    # 2) For each block:
-    #   - Determine BlockType
-    #   - Based on block type, create a new HTMLNode
-    #   - Parse (TextNode -> HTMLNode) and assign child HTML Nodes (recursive) to block (Create a text_to_children(str) -> list[HTMLNode])
-    #   - For the code block : no inline parsing for children
-    # 3) Add each of these parent HTMLNodes with children to one singular parent node which is a <div> element
-    # 4) Add Unit Tests
-    
-    
-    pass
+class ParentNode(HTMLNode):
+    def __init__(self, tag, children, props=None):
+        super().__init__(tag=tag, value=None, children=children, props=props)
+
+    def to_html(self):
+        if self.tag is None:
+            raise ValueError("Parent node requires a tag")
+        if self.children is None or len(self.children) == 0:
+            raise ValueError("Parent nodes must have children")
+
+        children_html = ""
+
+        for child in self.children:
+            children_html += child.to_html()
+
+        return f"<{self.tag}{self.props_to_html()}>{children_html}</{self.tag}>"
+
+
+# Leaf nodes cannot have children, value and tag are required, props is optional
+class LeafNode(HTMLNode):
+    def __init__(self, tag=None, value=None, props=None):
+        super().__init__(tag=tag, value=value, children=None, props=props)
+
+    def to_html(self):
+        if self.value is None:
+            raise ValueError("All leaf nodes must have a value")
+        if self.tag is None:
+            return self.value
+
+        return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
+
+    def __repr__(self):
+        return f'<{self.tag or "no tag"}{self.props_to_html()}>{self.value or "no value"}</{self.tag or "no tag"}>'

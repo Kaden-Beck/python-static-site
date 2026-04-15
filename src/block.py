@@ -35,3 +35,14 @@ def block_to_block_type(block: str) -> BlockType:
 
     # Else its a just paragraph block
     return BlockType.PARAGRAPH
+
+
+def get_heading_level(p_block: str) -> int:
+    level = 0
+    for char in p_block:
+        if char == " ":
+            return level
+        elif char == "#":
+            level += 1
+        else:
+            raise Exception(f"Error parsing heading:\n{p_block}")

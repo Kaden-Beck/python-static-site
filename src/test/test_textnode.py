@@ -3,10 +3,8 @@ import unittest
 from src.textnode import (
     TextNode,
     TextType,
-    text_note_to_html_node,
 )
-
-
+from src.textnode import text_node_to_html_node
 
 
 class TestTextNode(unittest.TestCase):
@@ -43,14 +41,14 @@ class TestTextNodeParsing(unittest.TestCase):
     # Plain text node should return plain text
     def test_plain_text(self):
         node = TextNode("This is the sample text", TextType.TEXT)
-        html = text_note_to_html_node(node).to_html()
+        html = text_node_to_html_node(node).to_html()
         self.assertEqual(html, "This is the sample text")
 
     # Text Node -> Bold HTML
     def test_bold_html(self):
         self.assertEqual(
             "<b>This is a bold element</b>",
-            text_note_to_html_node(
+            text_node_to_html_node(
                 TextNode("This is a bold element", TextType.BOLD)
             ).to_html(),
         )
@@ -59,7 +57,7 @@ class TestTextNodeParsing(unittest.TestCase):
     def test_italic_html(self):
         self.assertEqual(
             "<i>This is an italic element</i>",
-            text_note_to_html_node(
+            text_node_to_html_node(
                 TextNode("This is an italic element", TextType.ITALIC)
             ).to_html(),
         )
@@ -68,7 +66,7 @@ class TestTextNodeParsing(unittest.TestCase):
     def test_code_html(self):
         self.assertEqual(
             "<code>This is a code element</code>",
-            text_note_to_html_node(
+            text_node_to_html_node(
                 TextNode("This is a code element", TextType.CODE)
             ).to_html(),
         )
@@ -77,7 +75,7 @@ class TestTextNodeParsing(unittest.TestCase):
     def test_link_html(self):
         self.assertEqual(
             '<a href="https://www.google.com">This is a Link element</a>',
-            text_note_to_html_node(
+            text_node_to_html_node(
                 TextNode(
                     "This is a Link element", TextType.LINK, "https://www.google.com"
                 )
@@ -88,7 +86,7 @@ class TestTextNodeParsing(unittest.TestCase):
     def test_image_html(self):
         self.assertEqual(
             '<img src="https://www.google.com" alt="Alt Text"></img>',
-            text_note_to_html_node(
+            text_node_to_html_node(
                 TextNode("Alt Text", TextType.IMAGE, "https://www.google.com")
             ).to_html(),
         )
@@ -96,9 +94,7 @@ class TestTextNodeParsing(unittest.TestCase):
     # Pass an incorrect text type
     def test_bad_text_type(self):
         with self.assertRaises(Exception):
-            text_note_to_html_node(TextNode("Not a real type", TextType.URL))
-
-
+            text_node_to_html_node(TextNode("Not a real type", TextType.URL))
 
 
 if __name__ == "__main__":

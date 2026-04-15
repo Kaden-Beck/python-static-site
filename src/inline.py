@@ -1,7 +1,7 @@
 import re
 from typing import NamedTuple
 from src.textnode import TextNode, TextType
-
+from src.html_node import ParentNode
 
 class ImageTuple(NamedTuple):
     alt: str
@@ -129,3 +129,4 @@ def text_to_textnodes(text: str) -> list[TextNode]:
             )
         )
     )
+
