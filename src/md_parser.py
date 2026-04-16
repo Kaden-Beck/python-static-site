@@ -1,4 +1,4 @@
-from src.block import (
+from src.block_node import (
     markdown_to_blocks,
     block_to_block_type,
     BlockType,
