@@ -1,5 +1,4 @@
-import os
-import shutil
+import os, shutil, re
 from src.md_parser import markdown_to_html_node, extract_title
 
 
@@ -48,7 +47,7 @@ def copy_static_content(source, destination):
             copy_static_content(src_path, dst_path)
 
 
-def generate_page(from_path: str, template_path: str, dest_path: str):
+def generate_page(from_path: str, template_path: str, dest_path: str, basepath: str):
     print(
         f"Generating page from {from_path} to {dest_path} using template at {template_path}"
     )
@@ -57,13 +56,12 @@ def generate_page(from_path: str, template_path: str, dest_path: str):
     with open(template_path, "r") as t:
         template = t.read()
 
-    title = extract_title(md)
-
-    html = markdown_to_html_node(md).to_html()
-
-    new_page = template.replace("{{ Title }}", title.capitalize()).replace(
-        "{{ Content }}", html
-    )
+    replacements = {
+        "{{ Title }}": extract_title(md).capitalize(),
+        "{{ Content }}": markdown_to_html_node(md).to_html(),
+        'href="/': f'href="{basepath}',
+        'src="/': f'src="{basepath}',
+    }
 
     os.makedirs(
         os.path.dirname(
@@ -73,19 +71,23 @@ def generate_page(from_path: str, template_path: str, dest_path: str):
     )
 
     with open(dest_path, "w") as d:
-        d.write(new_page)
+        d.write(
+            re.compile("|".join(re.escape(k) for k in replacements)).sub(
+                lambda a: replacements[a.group(0)], template
+            )
+        )
 
 
 def generate_pages_recursive(
-    dir_path_content: str, template_path: str, dest_dir_path: str
+    dir_path_content: str, template_path: str, dest_dir_path: str, basepath: str
 ):
     for item in os.listdir(dir_path_content):
         src_path = os.path.join(dir_path_content, item)
 
         if os.path.isfile(src_path) and item.endswith(".md"):
             dest_path = os.path.join(dest_dir_path, item[:-3] + ".html")
-            generate_page(src_path, template_path, dest_path)
+            generate_page(src_path, template_path, dest_path, basepath)
 
         elif os.path.isdir(src_path):
             dest_path = os.path.join(dest_dir_path, item)
-            generate_pages_recursive(src_path, template_path, dest_path)
+            generate_pages_recursive(src_path, template_path, dest_path, basepath)
